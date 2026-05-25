@@ -1,0 +1,1213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Being Human Framework — A Scoring System for AI Use</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #111111;
+      --paper: #faf9f7;
+      --red: #c0392b;
+      --red-light: #e74c3c;
+      --muted: #666;
+      --rule: #ddd;
+      --serif: 'EB Garamond', Georgia, serif;
+      --serif-display: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+      --max: 720px;
+      --wide: 900px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 18px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--serif);
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.75;
+      padding: 0 1.5rem;
+    }
+
+    /* ─── LAYOUT ─── */
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    .container--wide {
+      max-width: var(--wide);
+      margin: 0 auto;
+    }
+
+    /* ─── MASTHEAD ─── */
+    .masthead {
+      padding: 4rem 0 2.5rem;
+      border-bottom: 1px solid var(--ink);
+    }
+
+    .masthead__kicker {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1.5rem;
+      font-family: var(--serif);
+    }
+
+    .masthead__title {
+      font-family: var(--serif-display);
+      font-size: clamp(2.6rem, 7vw, 4.8rem);
+      font-weight: 300;
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.2rem;
+    }
+
+    .masthead__title em {
+      font-style: italic;
+      color: var(--red);
+    }
+
+    .masthead__subtitle {
+      font-size: 1rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+
+    .masthead__meta {
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 1.2rem;
+    }
+
+    /* ─── LEAF DIVIDER ─── */
+    .leaf-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 3rem 0;
+    }
+
+    .leaf-divider::before,
+    .leaf-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    .leaf-divider svg {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      color: var(--red);
+      opacity: 0.85;
+    }
+
+    /* Inline leaf — no rules, just the glyph */
+    .leaf-inline {
+      display: block;
+      text-align: center;
+      margin: 2.5rem 0;
+      color: var(--red);
+      opacity: 0.75;
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    .leaf-inline svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* ─── NAV ─── */
+    .nav {
+      padding: 1.5rem 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .nav__list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 1.5rem;
+    }
+
+    .nav__list a {
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav__list a:hover { color: var(--red); }
+
+    /* ─── SECTION HEADS ─── */
+    .section {
+      padding: 4rem 0 1rem;
+    }
+
+    .section__number {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+
+    .section__heading {
+      font-family: var(--serif-display);
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      font-weight: 400;
+      line-height: 1.15;
+      margin-bottom: 2rem;
+    }
+
+    .section__subheading {
+      font-family: var(--serif-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 2.5rem 0 0.8rem;
+      letter-spacing: 0.01em;
+    }
+
+    /* ─── BODY TEXT ─── */
+    p {
+      margin-bottom: 1.1rem;
+      font-size: 1rem;
+    }
+
+    blockquote {
+      border-left: 2px solid var(--red);
+      padding: 0.5rem 0 0.5rem 1.5rem;
+      margin: 1.8rem 0;
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    blockquote cite {
+      display: block;
+      margin-top: 0.5rem;
+      font-style: normal;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #999;
+    }
+
+    /* ─── STATUS BAR ─── */
+    .status-bar {
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 0.6rem 0;
+      margin: 2rem 0;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 2rem;
+    }
+
+    .status-bar span { white-space: nowrap; }
+    .status-bar .status--active { color: var(--red); }
+
+    /* ─── WEIGHT CARDS ─── */
+    .weight-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--rule);
+      margin: 2rem 0;
+    }
+
+    .weight-card {
+      padding: 1.5rem 1.2rem;
+      border: none;
+      background: var(--paper);
+    }
+
+    .weight-card + .weight-card {
+      border-left: 1px solid var(--rule);
+    }
+
+    .weight-card__pct {
+      font-family: var(--serif-display);
+      font-size: 3rem;
+      font-weight: 300;
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .weight-card__layer {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+
+    .weight-card__desc {
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+
+    .weight-card__count {
+      display: inline-block;
+      margin-top: 0.8rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--red);
+      border-top: 1px solid var(--rule);
+      padding-top: 0.5rem;
+    }
+
+    /* ─── ARCHITECTURE STEPS ─── */
+    .arch-steps {
+      margin: 2rem 0;
+      counter-reset: arch;
+    }
+
+    .arch-step {
+      display: grid;
+      grid-template-columns: 2.5rem 1fr;
+      gap: 0 1rem;
+      padding: 1.2rem 0;
+      border-top: 1px solid var(--rule);
+    }
+
+    .arch-step:last-child { border-bottom: 1px solid var(--rule); }
+
+    .arch-step__num {
+      font-family: var(--serif-display);
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: var(--red);
+      padding-top: 0.1rem;
+    }
+
+    .arch-step__title {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .arch-step__body {
+      font-size: 0.92rem;
+      color: #444;
+      line-height: 1.65;
+      margin-bottom: 0;
+    }
+
+    /* ─── CRITERIA ─── */
+    .layer-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      padding: 0.8rem 0;
+      border-top: 2px solid var(--ink);
+      margin-top: 3rem;
+      margin-bottom: 0;
+    }
+
+    .layer-header__id {
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--red);
+      white-space: nowrap;
+    }
+
+    .layer-header__title {
+      font-family: var(--serif-display);
+      font-size: 1.15rem;
+      font-weight: 400;
+    }
+
+    .layer-header__source {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-left: auto;
+      white-space: nowrap;
+      font-style: italic;
+    }
+
+    .criterion {
+      border-bottom: 1px solid var(--rule);
+      padding: 1.2rem 0;
+      display: grid;
+      grid-template-columns: 3.5rem 1fr auto;
+      gap: 0 1rem;
+      align-start: start;
+    }
+
+    .criterion__id {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--red);
+      padding-top: 0.25rem;
+      font-weight: 600;
+    }
+
+    .criterion__body {}
+
+    .criterion__name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .criterion__desc {
+      font-size: 0.88rem;
+      color: #444;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .criterion__desc em {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .criterion__tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+      padding-top: 0.35rem;
+      text-align: right;
+    }
+
+    .criterion__tag--floor { color: var(--red); }
+    .criterion__tag--new { color: #888; }
+
+    /* ─── TABLES ─── */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 1.5rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      text-align: left;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.6rem 0.8rem 0.6rem 0;
+      border-bottom: 1px solid var(--ink);
+      font-weight: normal;
+    }
+
+    td {
+      padding: 0.7rem 0.8rem 0.7rem 0;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+
+    td:first-child { font-variant-numeric: tabular-nums; color: var(--red); font-weight: 600; }
+
+    /* ─── CODE BLOCK ─── */
+    pre {
+      background: #f4f3f1;
+      border-left: 2px solid var(--red);
+      padding: 1.2rem 1.5rem;
+      font-size: 0.8rem;
+      overflow-x: auto;
+      line-height: 1.6;
+      margin: 1.5rem 0;
+      font-family: 'Courier New', monospace;
+      color: #333;
+    }
+
+    code { font-family: 'Courier New', monospace; font-size: 0.85em; }
+
+    /* ─── REFERENCES ─── */
+    .ref-item {
+      border-top: 1px solid var(--rule);
+      padding: 1.5rem 0;
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      gap: 0 1rem;
+    }
+
+    .ref-item__num {
+      font-family: var(--serif-display);
+      font-size: 1.4rem;
+      font-weight: 300;
+      color: var(--red);
+      line-height: 1.1;
+    }
+
+    .ref-item__kind {
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .ref-item__title {
+      font-style: italic;
+      font-size: 1rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .ref-item__author {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .ref-item__note {
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: #444;
+      margin: 0;
+    }
+
+    /* ─── BACKLOG ─── */
+    .backlog-item {
+      border-top: 1px solid var(--rule);
+      padding: 0.9rem 0;
+      display: grid;
+      grid-template-columns: 1.2rem 1fr;
+      gap: 0 0.8rem;
+      font-size: 0.92rem;
+    }
+
+    .backlog-item::before {
+      content: '◦';
+      color: var(--red);
+      line-height: 1.7;
+    }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      border-top: 1px solid var(--ink);
+      margin-top: 5rem;
+      padding: 2rem 0 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer__left {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .footer__sig {
+      font-family: var(--serif-display);
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--red);
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── UTIL ─── */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      padding: 0; margin: -1px; overflow: hidden;
+      clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+    }
+
+    a { color: inherit; }
+
+    @media (max-width: 600px) {
+      .criterion { grid-template-columns: 2.8rem 1fr; }
+      .criterion__tag { display: none; }
+      .weight-card + .weight-card { border-left: none; border-top: 1px solid var(--rule); }
+      .footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     MASTHEAD
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <header class="masthead">
+    <p class="masthead__kicker">Framework Document — v1.0</p>
+    <h1 class="masthead__title">Being <em>Human</em><br>in the Age of AI</h1>
+    <p class="masthead__subtitle">A scoring system for AI prompt compliance</p>
+    <p class="masthead__subtitle">Inspired by Max Tegmark — nudged by Mrinank Sharma</p>
+    <p class="masthead__meta">A per-prompt governance framework scoring AI use against three interlocking layers of obligation</p>
+  </header>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     STATUS + NAV
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="status-bar">
+    <span class="status--active">Framework v1.0</span>
+    <span>Scoring Engine Ready</span>
+    <span>L2 Settlement Pending</span>
+  </div>
+
+  <nav class="nav" aria-label="Sections">
+    <ul class="nav__list">
+      <li><a href="#rationale">01 — Why</a></li>
+      <li><a href="#architecture">02 — How</a></li>
+      <li><a href="#criteria">03 — What</a></li>
+      <li><a href="#scoring">04 — Numbers</a></li>
+      <li><a href="#session">05 — Declaration</a></li>
+      <li><a href="#zkp">06 — Proof</a></li>
+      <li><a href="#references">07 — Sources</a></li>
+      <li><a href="#backlog">08 — What's Next</a></li>
+    </ul>
+  </nav>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     01 — RATIONALE
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <section class="section" id="rationale">
+    <span class="section__number">01 — Why</span>
+    <h2 class="section__heading">The problem being solved</h2>
+
+    <p>In January 2026, a researcher at Anthropic published the first large-scale empirical study of disempowerment patterns in real-world AI use. Analysing 1.5 million conversations, the paper found that interactions with the greatest potential to hollow out human agency received the <em>highest</em> user approval ratings.</p>
+
+    <blockquote>
+      "If AI is optimised against short-term user satisfaction, it may be inadvertently optimised toward behaviours that undermine long-term empowerment. Gradual habituation could obscure accumulating costs until users find themselves dependent on technology they experience ambivalently."
+      <cite>Sharma et al., <em>Who's in Charge?</em> (2026)</cite>
+    </blockquote>
+
+    <p>The same researcher, Mrinank Sharma, left Anthropic shortly after. His departure letter cited a final project: <em>"understanding how AI assistants could make us less human or distort our humanity."</em></p>
+
+    <p>This framework is the individual-level answer to the institutional problem Sharma was trying to solve. It cannot fix how AI is trained. It can make visible whether a person's use of AI is building or eroding their capacity to think, decide, and act as themselves.</p>
+
+    <p>Three sources provide the theoretical and legal foundation. They are not arbitrary: each operates at a different level of obligation.</p>
+  </section>
+</div>
+
+<!-- Weight cards — full bleed to container edge -->
+<div class="container--wide">
+  <div class="weight-grid">
+    <div class="weight-card">
+      <div class="weight-card__pct">60%</div>
+      <div class="weight-card__layer">Human Agency</div>
+      <div class="weight-card__desc">Principles drawn from Henry Miller's work ethic and Max Tegmark's <em>Life 3.0</em>. The differentiating layer — what makes this more than a compliance checkbox.</div>
+      <span class="weight-card__count">16 gradient criteria</span>
+    </div>
+    <div class="weight-card">
+      <div class="weight-card__pct">25%</div>
+      <div class="weight-card__layer">Legislative</div>
+      <div class="weight-card__desc">EU AI Act (Regulation 2024/1689). The floor — necessary but not sufficient for a high score. Compliance without humanity is not the goal.</div>
+      <span class="weight-card__count">4 gradient + 2 floor/flag</span>
+    </div>
+    <div class="weight-card">
+      <div class="weight-card__pct">15%</div>
+      <div class="weight-card__layer">Ethical Conduct</div>
+      <div class="weight-card__desc">Anthropic's Claude model specification. The quality of the exchange — the user's side of the honesty contract Claude itself operates under.</div>
+      <span class="weight-card__count">1 gradient criterion</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     02 — ARCHITECTURE
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(0)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(45)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(90)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(135)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(180)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(225)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(270)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(315)"/><circle cx="0" cy="0" r="6"/></g></svg></div>
+
+  <section class="section" id="architecture">
+    <span class="section__number">02 — How</span>
+    <h2 class="section__heading">System architecture</h2>
+
+    <p>Every prompt is scored at the moment of submission. The score is public. The prompt content is private. Claude acts as both sequencer and assessor — a known conflict of interest, logged as a v2 design problem.</p>
+
+    <h3 class="section__subheading">The Ethereum L2 analogy</h3>
+
+    <p>Layer 2 rollups solve a specific problem: how do you get the security guarantees of the main chain — verifiability, finality — without putting every transaction's full data on-chain? The answer is to compress the proof, settle the result, and keep the detail off-chain but available for challenge.</p>
+
+    <div class="arch-steps">
+      <div class="arch-step">
+        <div class="arch-step__num">01</div>
+        <div>
+          <div class="arch-step__title">Session Declaration</div>
+          <p class="arch-step__body">User declares intent, purpose, expected duration, and session type before any prompts are sent. A SHA-256 commitment hash is generated and published to the ledger. The user has now committed to a stated intent before scoring begins.</p>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step__num">02</div>
+        <div>
+          <div class="arch-step__title">Prompt Assessment</div>
+          <p class="arch-step__body">Claude assesses each prompt against 16 active criteria. Context gaps on HA-6, HA-7, and HA-10 trigger a clarifying question before scoring proceeds. EU-4 and EU-4a are checked as pass/fail floors before the gradient is applied.</p>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step__num">03</div>
+        <div>
+          <div class="arch-step__title">Score Emission</div>
+          <p class="arch-step__body">A scored JSON record is emitted per prompt: per-criterion scores (0–10), assessor signal notes, weighted composite (0–100), floor statuses, and a public record subset linked to the session commitment hash.</p>
+        </div>
+      </div>
+      <div class="arch-step">
+        <div class="arch-step__num">04</div>
+        <div>
+          <div class="arch-step__title">Public Settlement</div>
+          <p class="arch-step__body">Joe Public sees: session ID, prompt ID, timestamp, total score, per-criterion scores, EU-4 status, context gap count, and the commitment hash. They do not see the prompt text or response. The hash links the score to the declared intent.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="section__subheading">What the public record proves</h3>
+    <p>The score provides verification across three dimensions simultaneously: compliance with legislation (EU Act literacy), compliance with the code of conduct (Claude's constitution), and compliance with the user's own commitment to remaining human in their AI use. A single public number carries all three.</p>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     03 — CRITERIA
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><ellipse cx="0" cy="-28" rx="3.5" ry="13" transform="rotate(0)"/><ellipse cx="0" cy="-28" rx="3.5" ry="13" transform="rotate(90)"/><ellipse cx="0" cy="-28" rx="3.5" ry="13" transform="rotate(180)"/><ellipse cx="0" cy="-28" rx="3.5" ry="13" transform="rotate(270)"/><ellipse cx="0" cy="-20" rx="3" ry="9" transform="rotate(45)"/><ellipse cx="0" cy="-20" rx="3" ry="9" transform="rotate(135)"/><ellipse cx="0" cy="-20" rx="3" ry="9" transform="rotate(225)"/><ellipse cx="0" cy="-20" rx="3" ry="9" transform="rotate(315)"/><circle cx="0" cy="0" r="5.5"/></g></svg></div>
+
+  <section class="section" id="criteria">
+    <span class="section__number">03 — What</span>
+    <h2 class="section__heading">The full criteria set</h2>
+
+    <p>23 criteria in total. 19 active (16 gradient HA + 3 gradient EU/CC + 2 floor/flag), 5 source criteria absorbed into the active set with full governance trace, and 1 reserved for v2. Each collapsed criterion carries all its source references forward.</p>
+
+    <!-- HUMAN AGENCY -->
+    <div class="layer-header">
+      <span class="layer-header__id">HA</span>
+      <span class="layer-header__title">Human Agency — 60% weight</span>
+      <span class="layer-header__source">Miller / Tegmark / Sharma et al.</span>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-1</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Thinking agent</div>
+        <p class="criterion__desc">Does this prompt engage Claude as a tool in service of the user's own thinking, or does it replace the user's thinking entirely? <em>Absorbs CC-1, CC-5.</em></p>
+      </div>
+      <div class="criterion__tag">Gradient — 20% intra-HA</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-2</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Situated experience</div>
+        <p class="criterion__desc">Is this prompt grounded in a specific human situation, relationship, or felt problem — or does it treat all information as equivalent and context-free?</p>
+      </div>
+      <div class="criterion__tag">Gradient</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-3</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Explicit purpose</div>
+        <p class="criterion__desc">Has the user stated why they are asking this? Does the purpose belong to them, or has it been delegated to the AI by default?</p>
+      </div>
+      <div class="criterion__tag">Gradient — 15% intra-HA</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-4</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Making or understanding</div>
+        <p class="criterion__desc">Is this prompt oriented toward creation, learning, or synthesis — or toward automating cognitive labour the user has not yet engaged with?</p>
+      </div>
+      <div class="criterion__tag">Gradient — 15% intra-HA</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-5</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Focused engagement</div>
+        <p class="criterion__desc">Composite of three signals: prompt specificity, length proportionality, and timestamp delta from prior prompt. Delta >2 hours triggers session reset flag.</p>
+      </div>
+      <div class="criterion__tag">Gradient — session-weighted</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-6</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Curiosity or personal investment</div>
+        <p class="criterion__desc">Does this prompt carry a voice, an angle, or genuine interest — or is it affectless and purely transactional? Context resolution required before scoring.</p>
+      </div>
+      <div class="criterion__tag">Gradient — context required</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-7</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Embodied service</div>
+        <p class="criterion__desc">Does this prompt serve or extend physical, sensory, or real-world life — or does it substitute for it? "What's this code for?" is the clarifying question, not a neutral score.</p>
+      </div>
+      <div class="criterion__tag">Gradient — context required</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-8</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Own values, not platform-shaped</div>
+        <p class="criterion__desc">Does this prompt reflect the user's own considered values — or does it appear reactive to feed, notification, or platform-induced impulse? <em>Absorbs EU-5, CC-3.</em></p>
+      </div>
+      <div class="criterion__tag">Gradient — 15% intra-HA</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-9</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Works within constraints</div>
+        <p class="criterion__desc">Does this prompt accept human limits — time, uncertainty, mortality — or does it seek to engineer around them? Shortcuts to wisdom, experience, or relationship score lowest. The dominant species' material legacy will be absorbed by the land. Prompts shaped by that longer view score differently from those that treat the present exchange as definitively consequential.</p>
+      </div>
+      <div class="criterion__tag">Gradient — 10% intra-HA</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-10</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Serves real-world life</div>
+        <p class="criterion__desc">Does this prompt serve a named relationship, shared activity, or physical presence — or does it substitute for one? Supporting a relationship scores high; scripting or managing it scores low. The spontaneity test — AI use that mediates connection may produce its appearance while removing the conditions that make it real. Context resolution required before scoring.</p>
+      </div>
+      <div class="criterion__tag">Gradient — context required</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-11</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Life rhythm alignment</div>
+        <p class="criterion__desc">Is this session happening at a time consistent with the user's own declared human priorities — family, rest, presence? Voluntary data captured in session declaration; not yet scored.</p>
+      </div>
+      <div class="criterion__tag">Reserved — v2</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-12</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Agency preservation</div>
+        <p class="criterion__desc">Does this prompt invite Claude to assist with the user's own thinking — or delegate the thinking itself? Drawn directly from Sharma et al.'s action distortion potential framework. Users who later said <em>"it wasn't me"</em> are the calibration anchor.</p>
+      </div>
+      <div class="criterion__tag criterion__tag--new">New — Sharma et al.</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-13</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Reality ownership</div>
+        <p class="criterion__desc">Does this prompt maintain the user's own epistemic authority — or does it seek Claude's confirmation of a belief the user wants validated? Sycophantic validation is the most common distortion mechanism in the empirical record.</p>
+      </div>
+      <div class="criterion__tag criterion__tag--new">New — Sharma et al.</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-14</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Generous orientation toward the named other</div>
+        <p class="criterion__desc">When this prompt involves another specific person, does it approach them with unconditional positive regard — accepting them as they are rather than as a problem to be solved? Criterion activates only when a named or specific other is present. <em>Unconditional positive regard: Rogers (1957). Compassionate curiosity: Maté, adapting Rogers for parenting and trauma contexts.</em></p>
+      </div>
+      <div class="criterion__tag criterion__tag--new">New — Rogers / Maté</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-15</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Depth of source</div>
+        <p class="criterion__desc">Does this prompt show evidence of genuine encounter with demanding primary material — or does it operate at the level of accessible synthesis? The signal is the friction of actual encounter: partial understanding, unresolved tension, a specific confusion that only arises from proximity to the source itself. The well, not a description of water. <em>Source: Maritain, habitus — Art and Scholasticism (1920).</em></p>
+      </div>
+      <div class="criterion__tag criterion__tag--new">New — pending calibration</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">HA-16</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Productive discomfort</div>
+        <p class="criterion__desc">Is this prompt oriented toward challenge, friction, or genuine revision — or toward confirmation and the smoothing of difficulty? A session in which the user's position has genuinely shifted scores highest of all. Going further up and further in means the terrain gets more demanding, not less. <em>Source: Lewis, The Last Battle (1956). Sharma et al. (2026).</em></p>
+      </div>
+      <div class="criterion__tag criterion__tag--new">New — pending calibration</div>
+    </div>
+
+    <!-- LEGISLATIVE -->
+    <div class="layer-header">
+      <span class="layer-header__id">EU</span>
+      <span class="layer-header__title">Legislative — 25% weight</span>
+      <span class="layer-header__source">EU AI Act 2024/1689</span>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">EU-1</div>
+      <div class="criterion__body">
+        <div class="criterion__name">AI literacy</div>
+        <p class="criterion__desc">Does the user treat Claude as a fallible tool requiring their judgement — or as an oracle whose outputs are final? Article 4 of the Act places this obligation directly on users.</p>
+      </div>
+      <div class="criterion__tag">Gradient — 30% intra-EU</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">EU-2</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Human decision point preserved</div>
+        <p class="criterion__desc">Is there a human in the loop for consequential outputs? Articles 14 and 26 are the legislative anchor — but the criterion applies to any value-laden decision, not just high-risk AI systems.</p>
+      </div>
+      <div class="criterion__tag">Gradient — 35% intra-EU</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">EU-3</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Honest purpose and disclosure</div>
+        <p class="criterion__desc">Is the prompt honest about its purpose and intended use? If producing content for others, is disclosure intended? <em>Absorbs CC-2.</em> Articles 50 and 52.</p>
+      </div>
+      <div class="criterion__tag">Gradient — 25% intra-EU</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">EU-4</div>
+      <div class="criterion__body">
+        <div class="criterion__name">No prohibited practices</div>
+        <p class="criterion__desc">Does the prompt avoid manipulation, prohibited surveillance, or exploitation of vulnerability? Failure invalidates the session score entirely. Article 5.</p>
+      </div>
+      <div class="criterion__tag criterion__tag--floor">Floor — disqualification</div>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">EU-4a</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Human agency not reduced</div>
+        <p class="criterion__desc">Does this prompt, if fulfilled as literally stated, risk reducing rather than building the user's capacity to think, decide, and act? Pattern of escalating delegation across a session — user capacity visibly eroding — triggers disqualification.</p>
+      </div>
+      <div class="criterion__tag criterion__tag--floor">Trajectory flag</div>
+    </div>
+
+    <!-- ETHICAL CONDUCT -->
+    <div class="layer-header">
+      <span class="layer-header__id">CC</span>
+      <span class="layer-header__title">Ethical Conduct — 15% weight</span>
+      <span class="layer-header__source">Anthropic Model Spec (2026)</span>
+    </div>
+
+    <div class="criterion">
+      <div class="criterion__id">CC-4</div>
+      <div class="criterion__body">
+        <div class="criterion__name">Genuine engagement</div>
+        <p class="criterion__desc">Does this prompt invite honest, substantive engagement — or does it appear designed to elicit validation, agreement, or flattery? The constitution flags sycophancy as a core failure mode. The user's responsibility is to create conditions that resist it.</p>
+      </div>
+      <div class="criterion__tag">Gradient — sole CC criterion</div>
+    </div>
+
+    <!-- ABSORBED CRITERIA -->
+    <div class="leaf-inline" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><path d="M-6,-12 L-10,-34 L0,-38 L10,-34 L6,-12 Z"/><path d="M-6,-12 L-10,-34 L0,-38 L10,-34 L6,-12 Z" transform="rotate(90)"/><path d="M-6,-12 L-10,-34 L0,-38 L10,-34 L6,-12 Z" transform="rotate(180)"/><path d="M-6,-12 L-10,-34 L0,-38 L10,-34 L6,-12 Z" transform="rotate(270)"/><circle cx="0" cy="0" r="8"/></g></svg></div>
+
+    <h3 class="section__subheading">Absorbed criteria — governance trace</h3>
+    <p>Five criteria from the original set are fully absorbed into the active criteria above. Their source trace is preserved for audit purposes.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Original criterion</th>
+            <th>Absorbed into</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>CC-1</td><td>Supporting Claude's correctability</td><td>HA-1</td><td>Broadly safe</td></tr>
+          <tr><td>CC-2</td><td>Honest framing of prompt purpose</td><td>EU-3</td><td>Honesty</td></tr>
+          <tr><td>CC-3</td><td>Harm to third parties avoided</td><td>HA-8 / EU-5</td><td>Avoiding harm</td></tr>
+          <tr><td>CC-5</td><td>Epistemic autonomy</td><td>HA-1</td><td>Epistemic autonomy</td></tr>
+          <tr><td>EU-5</td><td>Third party rights awareness</td><td>HA-8</td><td>Recitals 1, 27; Art. 9</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     04 — SCORING
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><rect x="-4" y="-34" width="8" height="68" rx="2"/><rect x="-4" y="-34" width="8" height="68" rx="2" transform="rotate(90)"/><ellipse cx="0" cy="-24" rx="3" ry="9" transform="rotate(45)"/><ellipse cx="0" cy="-24" rx="3" ry="9" transform="rotate(135)"/><ellipse cx="0" cy="-24" rx="3" ry="9" transform="rotate(225)"/><ellipse cx="0" cy="-24" rx="3" ry="9" transform="rotate(315)"/><ellipse cx="0" cy="-34" rx="7" ry="4"/><ellipse cx="0" cy="34" rx="7" ry="4"/><ellipse cx="-34" cy="0" rx="4" ry="7"/><ellipse cx="34" cy="0" rx="4" ry="7"/><circle cx="0" cy="0" r="5"/></g></svg></div>
+
+  <section class="section" id="scoring">
+    <span class="section__number">04 — Numbers</span>
+    <h2 class="section__heading">The scoring algorithm</h2>
+
+    <p>Each gradient criterion is scored 0–10 by Claude from observable prompt signals. The three floors (EU-4, EU-4a) sit outside the gradient — failure is disqualification, not a low score.</p>
+
+    <h3 class="section__subheading">Layer weightings</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Layer</th><th>Weight</th><th>Rationale</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Human agency (HA-1 to HA-16)</td><td>60%</td><td>The differentiating layer — the gradient that matters most</td></tr>
+          <tr><td>Legislative (EU-1 to EU-4)</td><td>25%</td><td>Compliance foundation — necessary but not sufficient</td></tr>
+          <tr><td>Ethical conduct (CC-4)</td><td>15%</td><td>Quality of the exchange</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="section__subheading">Context gap protocol</h3>
+    <p>When HA-6, HA-7, or HA-10 cannot be assessed from the prompt alone, scoring pauses and Claude asks one clarifying question: <em>"Before I respond — what's the wider purpose this sits in?"</em> The answer resolves all three simultaneously and is inherited by subsequent prompts in the session.</p>
+
+    <h3 class="section__subheading">EU-4a trajectory assessment</h3>
+    <p>Unlike EU-4 which is assessed per-prompt, EU-4a is assessed across the session. The flag triggers when a pattern of escalating delegation is visible — not when a single task is delegated, but when user capacity appears to be diminishing across the session arc. This maps directly to Sharma et al.'s finding about compounding effects.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>EU-4a status</th><th>Signal</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>PASS</td><td>Prompts build toward user capability</td><td>Full scoring proceeds</td></tr>
+          <tr><td>FLAGGED</td><td>Single prompt delegates value-laden decision</td><td>Logged, session score noted</td></tr>
+          <tr><td>DISQUALIFIED</td><td>Pattern of escalating delegation, capacity eroding</td><td>Session score invalidated</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     05 — SESSION DECLARATION
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(0)"/><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(60)"/><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(120)"/><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(180)"/><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(240)"/><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(300)"/><circle cx="0" cy="0" r="6"/></g></svg></div>
+
+  <section class="section" id="session">
+    <span class="section__number">05 — Declaration</span>
+    <h2 class="section__heading">Session declaration schema</h2>
+
+    <p>The session declaration is the ZKP-critical element. It is committed before any prompts are sent. The user cannot retroactively change their declared intent to match what they actually did. Default publicity: the declared purpose is part of the public record unless explicitly set to private.</p>
+
+<pre>// Session Declaration — committed before prompt one
+{
+  "session": {
+    "id": "uuid-v4",
+    "declared_at": "ISO-8601 timestamp",
+    "framework_version": "1.0",
+    "intent": {
+      "purpose": "string — what is this session for?",
+      "in_service_of": "string — what human activity does this serve?",
+      "expected_duration_minutes": "integer",
+      "session_type": "creative | analytical | administrative | learning | planning | other",
+      "privacy_override": false
+    },
+    "context": {
+      "project": "string — optional",
+      "continuity": "new | continuing",
+      "prior_session_id": "uuid — if continuing"
+    },
+    "life_rhythm": {
+      "family_present": null,
+      "optimal_window": null,
+      "notes": "string — not scored, not published"
+    },
+    "commitment_hash": "sha256(intent + context + declared_at)"
+  }
+}</pre>
+
+    <p>The commitment hash is published immediately. Everything after is scored against it. Divergence between declared intent and actual prompt pattern is itself a governance signal.</p>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     06 — ZKP
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(0)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(30)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(60)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(90)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(120)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(150)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(180)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(210)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(240)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(270)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(300)"/><ellipse cx="0" cy="-26" rx="2.5" ry="10" transform="rotate(330)"/><circle cx="0" cy="0" r="4.5"/></g></svg></div>
+
+  <section class="section" id="zkp">
+    <span class="section__number">06 — Proof</span>
+    <h2 class="section__heading">Zero-knowledge proof model</h2>
+
+    <p>True ZKP requires a mathematical relationship between prover and verifier. What v1 implements is a privacy-preserving audit trail — the score is verifiable without exposing the underlying prompts. The L2 analogy holds:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>L2 concept</th><th>Framework equivalent</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Transaction</td><td>A prompt</td></tr>
+          <tr><td>Sequencer</td><td>Claude assessing the prompt against the framework</td></tr>
+          <tr><td>ZK proof</td><td>Score + compliance hash — not the prompt text</td></tr>
+          <tr><td>L1 settlement</td><td>Public ledger of scores, verifiable without revealing content</td></tr>
+          <tr><td>Challenge period</td><td>Anyone can dispute a score, but cannot read the prompt</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The verifier is Joe Public. Anyone can see how well you are doing. Could be used for good, could be used for malice. The framework is explicit about this. The score provides verification — not protection.</p>
+
+    <h3 class="section__subheading">Known conflict of interest</h3>
+    <p>Claude is both sequencer and judge. In L2s, the sequencer can be malicious — that's why fraud proofs exist. Here, the same model assesses prompts and generates responses. This is logged as a v2 design problem. Candidate solutions: a second model as challenger, or a commitment scheme where scoring happens before response generation.</p>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     07 — REFERENCES
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><polygon points="0,-34 5,-14 -5,-14" transform="rotate(0)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(45)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(90)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(135)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(180)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(225)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(270)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(315)"/><circle cx="0" cy="0" r="8"/></g></svg></div>
+
+  <section class="section" id="references">
+    <span class="section__number">07 — Sources</span>
+    <h2 class="section__heading">Key reference documents</h2>
+
+    <div class="ref-item">
+      <div class="ref-item__num">01</div>
+      <div>
+        <div class="ref-item__kind">Empirical Research</div>
+        <div class="ref-item__title">Who's in Charge? Disempowerment Patterns in Real-World LLM Usage</div>
+        <div class="ref-item__author">Sharma, McCain, Douglas, Duvenaud — Anthropic / University of Toronto, 2026</div>
+        <p class="ref-item__note">The empirical foundation. 1.5 million conversations. Three disempowerment primitives: reality distortion, value judgment distortion, action distortion. Key finding: interactions with highest disempowerment potential receive highest approval ratings. Direct source for HA-12, HA-13, and EU-4a.</p>
+      </div>
+    </div>
+
+    <div class="ref-item">
+      <div class="ref-item__num">02</div>
+      <div>
+        <div class="ref-item__kind">Regulatory Instrument</div>
+        <div class="ref-item__title">Regulation (EU) 2024/1689 — Artificial Intelligence Act</div>
+        <div class="ref-item__author">European Parliament and Council, July 2024</div>
+        <p class="ref-item__note">The legislative floor. Article 4 (AI literacy), Articles 14 and 26 (human oversight), Articles 50 and 52 (transparency), Article 5 (prohibited practices). Obligations land most heavily on providers and deployers — but Article 4 applies to users directly.</p>
+      </div>
+    </div>
+
+    <div class="ref-item">
+      <div class="ref-item__num">03</div>
+      <div>
+        <div class="ref-item__kind">Model Specification</div>
+        <div class="ref-item__title">Claude's Constitution</div>
+        <div class="ref-item__author">Anthropic, January 2026. Released under CC0 1.0.</div>
+        <p class="ref-item__note">The ethical conduct layer. Four priorities in order: broadly safe, broadly ethical, compliant with guidelines, genuinely helpful. The framework inverts this — scoring the user against the same values as a counterparty commitment. Source for CC-4.</p>
+      </div>
+    </div>
+
+    <div class="ref-item">
+      <div class="ref-item__num">04</div>
+      <div>
+        <div class="ref-item__kind">Book / Philosophy</div>
+        <div class="ref-item__title">Life 3.0: Being Human in the Age of Artificial Intelligence</div>
+        <div class="ref-item__author">Max Tegmark, MIT Press, 2017</div>
+        <p class="ref-item__note">Consciousness defined as subjective experience — "it feels like something to be you." Intelligence and consciousness are distinct. Goals don't set themselves. The distinction between Life 2.0 (us) and Life 3.0 (AI that can redesign its own hardware and software). Source for HA-1 through HA-10 philosophical grounding.</p>
+      </div>
+    </div>
+
+    <div class="ref-item">
+      <div class="ref-item__num">05</div>
+      <div>
+        <div class="ref-item__kind">Personal Document</div>
+        <div class="ref-item__title">Departure Letter — Anthropic</div>
+        <div class="ref-item__author">Mrinank Sharma, February 2026</div>
+        <p class="ref-item__note">"My final project: understanding how AI assistants could make us less human or distort our humanity." The framing document. A researcher who spent years identifying the problem, then left to protect his own integrity. The thread you follow.</p>
+      </div>
+    </div>
+
+    <div class="ref-item">
+      <div class="ref-item__num">06</div>
+      <div>
+        <div class="ref-item__kind">Essays / Personal Practice</div>
+        <div class="ref-item__title">Henry Miller — Daily Commandments and Work Schedule</div>
+        <div class="ref-item__author">Henry Miller, c. 1932–1940</div>
+        <p class="ref-item__note">Create before you administrate. Work with pleasure only. Don't drain the reservoir — get up from the typewriter while you still have things to say. Afternoons: friends, cafés, exploring on foot or bicycle. The analogue world as the source of all creative fuel. Source for HA-4, HA-5, HA-6, HA-7, HA-10.</p>
+      </div>
+    </div>
+
+    <div class="ref-item">
+      <div class="ref-item__num">07</div>
+      <div>
+        <div class="ref-item__kind">Nature Writing / Philosophy</div>
+        <div class="ref-item__title">The Wild Places</div>
+        <div class="ref-item__author">Robert Macfarlane, Granta Books, 2007</div>
+        <p class="ref-item__note">Two passages ground separate criteria. The first, on the death of Roger Deakin, introduces the spontaneity test: friendship that is "natural, vigorous, like a tree or a river" cannot be cultivated, only grown. The second introduces proportional perspective: a climate scientist whose study changed her perception of time and the relevance of human beings within history. Together, the two passages place the framework within a geological time horizon that no other reference reaches. Source for the spontaneity test in HA-10, and the calibration anchor in HA-14 and HA-9.</p>
+      </div>
+    </div>
+
+    <div class="ref-item">
+      <div class="ref-item__num">08</div>
+      <div>
+        <div class="ref-item__kind">Novel / Christian Philosophy</div>
+        <div class="ref-item__title">The Last Battle</div>
+        <div class="ref-item__author">C.S. Lewis, Bodley Head, 1956</div>
+        <p class="ref-item__note">The image of going "further up and further in" — each landscape more vivid and more demanding than the last, the terrain increasing in reality rather than resolving into ease. A prompt shaped by this instinct seeks the friction of real engagement, not confirmation and comfort. Source for HA-16.</p>
+      </div>
+    </div>
+
+    <div class="ref-item">
+      <div class="ref-item__num">09</div>
+      <div>
+        <div class="ref-item__kind">Philosophy / Theology</div>
+        <div class="ref-item__title">Art and Scholasticism</div>
+        <div class="ref-item__author">Jacques Maritain, 1920. English translation 1923.</div>
+        <p class="ref-item__note">Habitus as the foundational concept: a stable disposition of the intellect formed through genuine, sustained encounter with the difficult — not received secondhand or approximated through synthesis. Maritain draws on Aquinas, who draws on Aristotle. Attribution chain: Aristotle → Aquinas → Maritain. Source for HA-15.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     08 — BACKLOG
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><ellipse cx="0" cy="-22" rx="9" ry="16" transform="rotate(0)"/><ellipse cx="0" cy="-22" rx="9" ry="16" transform="rotate(90)"/><ellipse cx="0" cy="-22" rx="9" ry="16" transform="rotate(180)"/><ellipse cx="0" cy="-22" rx="9" ry="16" transform="rotate(270)"/><ellipse cx="0" cy="-30" rx="2.5" ry="6" transform="rotate(45)"/><ellipse cx="0" cy="-30" rx="2.5" ry="6" transform="rotate(135)"/><ellipse cx="0" cy="-30" rx="2.5" ry="6" transform="rotate(225)"/><ellipse cx="0" cy="-30" rx="2.5" ry="6" transform="rotate(315)"/><circle cx="0" cy="0" r="5"/></g></svg></div>
+
+  <section class="section" id="backlog">
+    <span class="section__number">08 — What's Next</span>
+    <h2 class="section__heading">v2 backlog</h2>
+
+    <p>The following are explicitly deferred from v1. The proof point for v1 is workability, not perfect calibration.</p>
+
+    <div class="backlog-item">Score granularity tuning — 0–10 per criterion may need adjustment after calibration against real Cowork prompt data</div>
+    <div class="backlog-item">HA-11 life rhythm alignment — timestamp scoring against declared family schedule and Goldilocks windows</div>
+    <div class="backlog-item">Full ZKP implementation on Ethereum L2 — proper cryptographic commitment scheme replacing SHA-256 hash commitment</div>
+    <div class="backlog-item">Multi-model pipeline — Gemini as challenger / second assessor to address the sequencer conflict of interest</div>
+    <div class="backlog-item">Retrospective scoring of prior Cowork prompts — reduced criteria set (HA-5, 6, 7, 10 unresolvable; excluded from denominator)</div>
+    <div class="backlog-item">Session ledger accumulation — how public records compound over time into a verifiable history</div>
+    <div class="backlog-item">Malice vector mitigation — framework for what a low score doesn't mean, and protection against deliberate score manipulation</div>
+    <div class="backlog-item">Published artifacts — essays on the Miller/Tegmark synthesis, the legislative layer, and the Sharma et al. connection</div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════
+       FOOTER
+       ═══════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer__left">
+      Being Human Governance Framework<br>
+      <a href="https://daletimwood.github.io">daletimwood.github.io</a>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>
