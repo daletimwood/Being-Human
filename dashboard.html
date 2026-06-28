@@ -479,18 +479,16 @@
   <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><polygon points="0,-34 5,-14 -5,-14" transform="rotate(0)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(45)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(90)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(135)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(180)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(225)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(270)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(315)"/><circle cx="0" cy="0" r="8"/></g></svg></div>
 
   <section class="section" id="logging">
-    <span class="section__number">05 — Logging</span>
-    <h2 class="section__heading">How to add a session score</h2>
+    <span class="section__number">05 — Method</span>
+    <h2 class="section__heading">How scores are generated</h2>
 
-    <p>At the end of any Claude session, paste this prompt to generate a score entry. Claude will assess the session against all 20 active criteria and output a JSON block ready to append to <code>scores.json</code>.</p>
+    <p>Every Claude session is scored at close against all 20 active criteria. The assessment is performed by Claude itself, working from observable signals in the prompt record — not self-reported. This is the known conflict of interest logged in the framework's v2 backlog; a second model as challenger is the candidate fix.</p>
 
-    <blockquote>
-      Score this session against the Being Human Framework v1.0. For each of the 20 active criteria (HA-1 through HA-17, EU-1 through EU-3, CC-4), assign a score from 0–10 based on observable prompt signals. Then check EU-4 (pass/fail) and EU-4a (pass/flagged/disqualified). Output a valid JSON object matching the scores.json session schema. Do not include prompt text. Declared session intent: [paste your session declaration here].
-    </blockquote>
+    <p>Two automated processes feed this dashboard. First, a per-session scoring pass runs at the end of each Claude conversation: Claude assesses the session against the full criterion set (HA-1 through HA-17, EU-1 through EU-3, CC-4), checks the EU-4 and EU-4a floors, and emits a structured score record. Second, a weekly scheduled task runs every Sunday and conducts an adversarial audit of the accumulated data — checking for gaming patterns, criteria drift, and calibration gaps. Proposed amendments from that audit are the mechanism by which the framework evolves.</p>
 
-    <p>Then open <code>scores.json</code> in the GitHub web editor and append the returned object to the <code>"sessions"</code> array. The dashboard fetches live from the raw GitHub URL — no build step required.</p>
+    <p>Scores are published to this dashboard by committing the score record to <code>scores.json</code> in the public repository. The dashboard fetches live from that file — no build step, no intermediary. The commitment hash in each record links the published score to the intent declared before the session began; the declared intent cannot be revised retroactively to match what actually happened.</p>
 
-    <h3 class="section__subheading">Session schema</h3>
+    <h3 class="section__subheading">Score record schema</h3>
 <pre>{
   "session_id": "uuid-v4",
   "declared_at": "2026-06-28T09:00:00Z",
