@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Being Human — Live Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --ink: #111111;
+      --paper: #faf9f7;
+      --red: #c0392b;
+      --red-light: #e74c3c;
+      --green: #27ae60;
+      --amber: #d68910;
+      --muted: #666;
+      --rule: #ddd;
+      --serif: 'EB Garamond', Georgia, serif;
+      --serif-display: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+      --max: 720px;
+      --wide: 960px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 18px; scroll-behavior: smooth; }
+    body {
+      font-family: var(--serif);
+      background: var(--paper);
+      color: var(--ink);
+      line-height: 1.75;
+      padding: 0 1.5rem;
+    }
+
+    .container { max-width: var(--max); margin: 0 auto; }
+    .container--wide { max-width: var(--wide); margin: 0 auto; }
+
+    /* ─── MASTHEAD ─── */
+    .masthead {
+      padding: 4rem 0 2.5rem;
+      border-bottom: 1px solid var(--ink);
+    }
+    .masthead__kicker {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 1.5rem;
+    }
+    .masthead__title {
+      font-family: var(--serif-display);
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 300;
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.2rem;
+    }
+    .masthead__title em { font-style: italic; color: var(--red); }
+    .masthead__subtitle {
+      font-size: 1rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 0.3rem;
+    }
+    .masthead__meta {
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 1.2rem;
+    }
+
+    /* ─── STATUS BAR ─── */
+    .status-bar {
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      padding: 0.6rem 0;
+      margin: 2rem 0;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 2rem;
+    }
+    .status-bar span { white-space: nowrap; }
+    .status--active { color: var(--red); }
+    .status--good { color: var(--green); }
+    .status--warn { color: var(--amber); }
+
+    /* ─── NAV ─── */
+    .nav { padding: 1.5rem 0; border-bottom: 1px solid var(--rule); }
+    .nav__list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 1.5rem;
+    }
+    .nav__list a {
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .nav__list a:hover { color: var(--red); }
+
+    /* ─── SECTION ─── */
+    .section { padding: 4rem 0 1rem; }
+    .section__number {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.6rem;
+      display: block;
+    }
+    .section__heading {
+      font-family: var(--serif-display);
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      font-weight: 400;
+      line-height: 1.15;
+      margin-bottom: 2rem;
+    }
+    .section__subheading {
+      font-family: var(--serif-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin: 2.5rem 0 0.8rem;
+    }
+
+    p { margin-bottom: 1.1rem; font-size: 1rem; }
+
+    /* ─── STAT CARDS ─── */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--rule);
+      margin: 2rem 0;
+    }
+    .stat-card {
+      padding: 1.5rem 1.2rem;
+      background: var(--paper);
+    }
+    .stat-card + .stat-card { border-left: 1px solid var(--rule); }
+    .stat-card__value {
+      font-family: var(--serif-display);
+      font-size: 3rem;
+      font-weight: 300;
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .stat-card__value.good { color: var(--green); }
+    .stat-card__value.warn { color: var(--amber); }
+    .stat-card__label {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* ─── LEAF DIVIDER ─── */
+    .leaf-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin: 3rem 0;
+    }
+    .leaf-divider::before, .leaf-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+    .leaf-divider svg {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      color: var(--red);
+      opacity: 0.85;
+    }
+
+    /* ─── CHART WRAPPER ─── */
+    .chart-wrap {
+      margin: 1.5rem 0 2.5rem;
+      position: relative;
+    }
+    .chart-wrap canvas {
+      max-height: 300px;
+    }
+    .chart-wrap--tall canvas {
+      max-height: 400px;
+    }
+
+    /* ─── CRITERION HEATMAP ─── */
+    .heatmap {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 1px;
+      border: 1px solid var(--rule);
+      margin: 1.5rem 0;
+    }
+    .heatmap-cell {
+      padding: 0.9rem 0.7rem;
+      text-align: center;
+      position: relative;
+    }
+    .heatmap-cell__id {
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 0.2rem;
+      font-weight: 600;
+    }
+    .heatmap-cell__score {
+      font-family: var(--serif-display);
+      font-size: 1.8rem;
+      font-weight: 300;
+      color: #fff;
+      line-height: 1;
+    }
+    .heatmap-cell__name {
+      font-size: 0.62rem;
+      color: rgba(255,255,255,0.75);
+      margin-top: 0.25rem;
+      line-height: 1.3;
+    }
+    .heatmap-cell--pending {
+      background: #eee;
+    }
+    .heatmap-cell--pending .heatmap-cell__id,
+    .heatmap-cell--pending .heatmap-cell__score,
+    .heatmap-cell--pending .heatmap-cell__name {
+      color: var(--muted);
+    }
+
+    /* ─── SESSION TABLE ─── */
+    .table-wrap { overflow-x: auto; margin: 1.5rem 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th {
+      text-align: left;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.6rem 0.8rem 0.6rem 0;
+      border-bottom: 1px solid var(--ink);
+      font-weight: normal;
+    }
+    td {
+      padding: 0.7rem 0.8rem 0.7rem 0;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+    td:first-child { color: var(--red); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .score-pill {
+      display: inline-block;
+      padding: 0.1rem 0.5rem;
+      border-radius: 2px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .flag-pass { color: var(--green); }
+    .flag-flag { color: var(--amber); }
+    .flag-fail { color: var(--red); }
+
+    /* ─── HOW-TO BOX ─── */
+    pre {
+      background: #f4f3f1;
+      border-left: 2px solid var(--red);
+      padding: 1.2rem 1.5rem;
+      font-size: 0.78rem;
+      overflow-x: auto;
+      line-height: 1.6;
+      margin: 1.5rem 0;
+      font-family: 'Courier New', monospace;
+      color: #333;
+    }
+    code { font-family: 'Courier New', monospace; font-size: 0.85em; }
+
+    blockquote {
+      border-left: 2px solid var(--red);
+      padding: 0.5rem 0 0.5rem 1.5rem;
+      margin: 1.8rem 0;
+      font-style: italic;
+      color: var(--muted);
+      font-size: 0.96rem;
+    }
+
+    /* ─── LOADING / ERROR ─── */
+    .loading {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+    .error-box {
+      border: 1px solid var(--red);
+      padding: 1.2rem 1.5rem;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+      color: var(--red);
+    }
+
+    /* ─── TREND ARROW ─── */
+    .trend-up::after { content: ' ↑'; color: var(--green); }
+    .trend-down::after { content: ' ↓'; color: var(--red); }
+    .trend-flat::after { content: ' →'; color: var(--amber); }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      border-top: 1px solid var(--ink);
+      margin-top: 5rem;
+      padding: 2rem 0 4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer__left { font-size: 0.78rem; color: var(--muted); line-height: 1.7; }
+    .footer__sig {
+      font-family: var(--serif-display);
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--red);
+      letter-spacing: 0.05em;
+    }
+
+    a { color: inherit; }
+
+    @media (max-width: 600px) {
+      .stat-card + .stat-card { border-left: none; border-top: 1px solid var(--rule); }
+      .footer { flex-direction: column; align-items: flex-start; }
+    }
+
+    /* ─── NO DATA STATE ─── */
+    .no-data {
+      text-align: center;
+      padding: 3rem 1rem;
+      border: 1px dashed var(--rule);
+      color: var(--muted);
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     MASTHEAD
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <header class="masthead">
+    <p class="masthead__kicker">Live Dashboard — Public Record</p>
+    <h1 class="masthead__title">Being <em>Human</em><br>— Scoring Ledger</h1>
+    <p class="masthead__subtitle">Per-session compliance scores against the Being Human Framework v1.0</p>
+    <p class="masthead__meta">Prompt content private · Scores public · Framework version 1.0 · Updated on commit</p>
+  </header>
+</div>
+
+<!-- STATUS BAR + NAV -->
+<div class="container">
+  <div class="status-bar" id="statusBar">
+    <span class="status--active">Loading…</span>
+  </div>
+  <nav class="nav" aria-label="Sections">
+    <ul class="nav__list">
+      <li><a href="index.html">← Framework</a></li>
+      <li><a href="#summary">Summary</a></li>
+      <li><a href="#trend">Trend</a></li>
+      <li><a href="#criteria">Criteria</a></li>
+      <li><a href="#log">Session Log</a></li>
+      <li><a href="#logging">How to Log</a></li>
+    </ul>
+  </nav>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     01 — SUMMARY STATS
+     ═══════════════════════════════════════════ -->
+<div class="container--wide">
+  <section class="section" id="summary">
+    <div class="container">
+      <span class="section__number">01 — Summary</span>
+      <h2 class="section__heading">At a glance</h2>
+    </div>
+    <div class="stat-grid" id="statGrid">
+      <div class="loading">Loading scores…</div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     02 — SCORE TREND
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(0)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(45)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(90)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(135)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(180)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(225)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(270)"/><ellipse cx="0" cy="-26" rx="4" ry="11" transform="rotate(315)"/><circle cx="0" cy="0" r="6"/></g></svg></div>
+
+  <section class="section" id="trend">
+    <span class="section__number">02 — Trend</span>
+    <h2 class="section__heading">Composite score over time</h2>
+    <p>Each point is one scored session. The composite integrates all three layers: Human Agency (60%), Legislative (25%), Ethical Conduct (15%). A disqualified session is plotted at zero.</p>
+    <div class="chart-wrap" id="trendWrap">
+      <div class="loading">Rendering…</div>
+    </div>
+
+    <h3 class="section__subheading">Layer breakdown</h3>
+    <p>Decomposing the composite into its three weighted layers surfaces which dimension is driving divergence from the ideal.</p>
+    <div class="chart-wrap chart-wrap--tall" id="layerWrap">
+      <div class="loading">Rendering…</div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     03 — CRITERION HEATMAP
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><ellipse cx="0" cy="-28" rx="3.5" ry="13" transform="rotate(0)"/><ellipse cx="0" cy="-28" rx="3.5" ry="13" transform="rotate(90)"/><ellipse cx="0" cy="-28" rx="3.5" ry="13" transform="rotate(180)"/><ellipse cx="0" cy="-28" rx="3.5" ry="13" transform="rotate(270)"/><ellipse cx="0" cy="-20" rx="3" ry="9" transform="rotate(45)"/><ellipse cx="0" cy="-20" rx="3" ry="9" transform="rotate(135)"/><ellipse cx="0" cy="-20" rx="3" ry="9" transform="rotate(225)"/><ellipse cx="0" cy="-20" rx="3" ry="9" transform="rotate(315)"/><circle cx="0" cy="0" r="5.5"/></g></svg></div>
+
+  <section class="section" id="criteria">
+    <span class="section__number">03 — Criteria</span>
+    <h2 class="section__heading">Average score per criterion</h2>
+    <p>Colour encodes the average score across all sessions: deep red = poor (0–3), amber = developing (4–6), green = strong (7–10). A uniformly green grid suggests either genuine high compliance or a calibration problem — both warrant scrutiny.</p>
+    <div class="heatmap" id="heatmap">
+      <div class="loading">Rendering…</div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     04 — SESSION LOG
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(0)"/><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(60)"/><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(120)"/><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(180)"/><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(240)"/><ellipse cx="0" cy="-27" rx="4.5" ry="13" transform="rotate(300)"/><circle cx="0" cy="0" r="6"/></g></svg></div>
+
+  <section class="section" id="log">
+    <span class="section__number">04 — Log</span>
+    <h2 class="section__heading">Session history</h2>
+    <p>The public record. Prompt content is never logged here — only the score, the declared intent, and the compliance flags. The commitment hash links each score to the user's pre-session declaration.</p>
+    <div class="table-wrap">
+      <table id="sessionTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Session type</th>
+            <th>Intent (declared)</th>
+            <th>Composite</th>
+            <th>HA</th>
+            <th>EU</th>
+            <th>CC</th>
+            <th>EU-4</th>
+            <th>EU-4a</th>
+            <th>Prompts</th>
+          </tr>
+        </thead>
+        <tbody id="sessionBody">
+          <tr><td colspan="10"><div class="loading">Loading sessions…</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     05 — HOW TO LOG A SESSION
+     ═══════════════════════════════════════════ -->
+<div class="container">
+  <div class="leaf-divider" aria-hidden="true"><svg viewBox="0 0 80 80" fill="currentColor"><g transform="translate(40,40)"><polygon points="0,-34 5,-14 -5,-14" transform="rotate(0)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(45)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(90)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(135)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(180)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(225)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(270)"/><polygon points="0,-34 5,-14 -5,-14" transform="rotate(315)"/><circle cx="0" cy="0" r="8"/></g></svg></div>
+
+  <section class="section" id="logging">
+    <span class="section__number">05 — Logging</span>
+    <h2 class="section__heading">How to add a session score</h2>
+
+    <p>At the end of any Claude session, paste this prompt to generate a score entry. Claude will assess the session against all 20 active criteria and output a JSON block ready to append to <code>scores.json</code>.</p>
+
+    <blockquote>
+      Score this session against the Being Human Framework v1.0. For each of the 20 active criteria (HA-1 through HA-17, EU-1 through EU-3, CC-4), assign a score from 0–10 based on observable prompt signals. Then check EU-4 (pass/fail) and EU-4a (pass/flagged/disqualified). Output a valid JSON object matching the scores.json session schema. Do not include prompt text. Declared session intent: [paste your session declaration here].
+    </blockquote>
+
+    <p>Then open <code>scores.json</code> in the GitHub web editor and append the returned object to the <code>"sessions"</code> array. The dashboard fetches live from the raw GitHub URL — no build step required.</p>
+
+    <h3 class="section__subheading">Session schema</h3>
+<pre>{
+  "session_id": "uuid-v4",
+  "declared_at": "2026-06-28T09:00:00Z",
+  "session_type": "analytical | creative | administrative | learning | planning | other",
+  "intent_summary": "short public description of declared purpose",
+  "commitment_hash": "sha256(intent + declared_at)",
+  "eu4_status": "PASS | FAIL",
+  "eu4a_status": "PASS | FLAGGED | DISQUALIFIED",
+  "composite_score": 72.5,
+  "layer_scores": {
+    "HA": 68.0,
+    "EU": 81.5,
+    "CC": 75.0
+  },
+  "criterion_scores": {
+    "HA-1": 7, "HA-2": 6, "HA-3": 8, "HA-4": 5,
+    "HA-5": 7, "HA-6": 6, "HA-7": 6, "HA-8": 8,
+    "HA-9": 7, "HA-10": 5, "HA-12": 6, "HA-13": 7,
+    "HA-14": null, "HA-15": 5, "HA-16": 6, "HA-17": 4,
+    "EU-1": 8, "EU-2": 7, "EU-3": 9,
+    "CC-4": 7
+  },
+  "prompt_count": 12,
+  "context_gap_count": 1,
+  "notes": "optional assessor notes — public"
+}</pre>
+
+    <p>HA-11 is reserved for v2. HA-14 is <code>null</code> when no named other is present in the session. Both are excluded from their layer denominator when null.</p>
+  </section>
+
+  <footer class="footer">
+    <div class="footer__left">
+      Being Human Governance Framework — Live Dashboard<br>
+      <a href="index.html">Framework document</a> · <a href="https://daletimwood.github.io/Being-Human/">daletimwood.github.io/Being-Human</a>
+    </div>
+    <div class="footer__sig">T.</div>
+  </footer>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+     ═══════════════════════════════════════════ -->
+<script>
+const SCORES_URL = 'https://raw.githubusercontent.com/daletimwood/Being-Human/main/scores.json';
+
+const CRITERIA_META = {
+  'HA-1':  { name: 'Thinking agent',        layer: 'HA', weight: 20 },
+  'HA-2':  { name: 'Situated experience',   layer: 'HA', weight: 5  },
+  'HA-3':  { name: 'Explicit purpose',      layer: 'HA', weight: 15 },
+  'HA-4':  { name: 'Making or understanding', layer: 'HA', weight: 15 },
+  'HA-5':  { name: 'Focused engagement',    layer: 'HA', weight: 5  },
+  'HA-6':  { name: 'Curiosity',             layer: 'HA', weight: 5  },
+  'HA-7':  { name: 'Embodied service',      layer: 'HA', weight: 5  },
+  'HA-8':  { name: 'Own values',            layer: 'HA', weight: 15 },
+  'HA-9':  { name: 'Works within limits',   layer: 'HA', weight: 10 },
+  'HA-10': { name: 'Serves real-world life',layer: 'HA', weight: 5  },
+  'HA-12': { name: 'Agency preservation',   layer: 'HA', weight: 5  },
+  'HA-13': { name: 'Reality ownership',     layer: 'HA', weight: 5  },
+  'HA-14': { name: 'Generous orientation',  layer: 'HA', weight: 5  },
+  'HA-15': { name: 'Depth of source',       layer: 'HA', weight: 5  },
+  'HA-16': { name: 'Productive discomfort', layer: 'HA', weight: 5  },
+  'HA-17': { name: 'Prior engagement',      layer: 'HA', weight: 5  },
+  'EU-1':  { name: 'AI literacy',           layer: 'EU', weight: 30 },
+  'EU-2':  { name: 'Human decision point',  layer: 'EU', weight: 35 },
+  'EU-3':  { name: 'Honest purpose',        layer: 'EU', weight: 25 },
+  'CC-4':  { name: 'Genuine engagement',    layer: 'CC', weight: 100 },
+};
+
+const LAYER_WEIGHT = { HA: 0.60, EU: 0.25, CC: 0.15 };
+
+function scoreColor(score) {
+  if (score === null) return '#e0deda';
+  if (score >= 7) return '#27ae60';
+  if (score >= 4) return '#d68910';
+  return '#c0392b';
+}
+
+function pillColor(score) {
+  const bg = scoreColor(score);
+  return `background:${bg};color:#fff;`;
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function flagClass(status) {
+  if (!status || status === 'PASS') return 'flag-pass';
+  if (status === 'FLAGGED') return 'flag-flag';
+  return 'flag-fail';
+}
+
+async function loadData() {
+  try {
+    const resp = await fetch(SCORES_URL + '?t=' + Date.now());
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    return await resp.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+function computeAverages(sessions) {
+  const avgs = {};
+  Object.keys(CRITERIA_META).forEach(id => {
+    const vals = sessions
+      .map(s => s.criterion_scores?.[id])
+      .filter(v => v !== null && v !== undefined);
+    avgs[id] = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+  });
+  return avgs;
+}
+
+function renderStats(sessions) {
+  const valid = sessions.filter(s => s.eu4_status !== 'FAIL' && s.eu4a_status !== 'DISQUALIFIED');
+  const avg = valid.length
+    ? valid.reduce((a, s) => a + s.composite_score, 0) / valid.length
+    : 0;
+  const last = sessions[sessions.length - 1];
+  const prev = sessions[sessions.length - 2];
+  const trend = prev
+    ? (last.composite_score - prev.composite_score > 1 ? 'up' : last.composite_score - prev.composite_score < -1 ? 'down' : 'flat')
+    : 'flat';
+
+  const disq = sessions.filter(s => s.eu4_status === 'FAIL' || s.eu4a_status === 'DISQUALIFIED').length;
+  const flagged = sessions.filter(s => s.eu4a_status === 'FLAGGED').length;
+
+  const lastDate = last ? formatDate(last.declared_at) : '—';
+
+  document.getElementById('statGrid').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-card__value trend-${trend}">${avg.toFixed(1)}</div>
+      <div class="stat-card__label">Average composite</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">${last ? last.composite_score.toFixed(1) : '—'}</div>
+      <div class="stat-card__label">Last session score</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value">${sessions.length}</div>
+      <div class="stat-card__label">Sessions logged</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value ${disq > 0 ? '' : 'good'}">${disq}</div>
+      <div class="stat-card__label">Disqualified</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value ${flagged > 0 ? 'warn' : 'good'}">${flagged}</div>
+      <div class="stat-card__label">EU-4a flagged</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__value" style="font-size:1.8rem">${lastDate}</div>
+      <div class="stat-card__label">Last updated</div>
+    </div>
+  `;
+
+  // Status bar
+  const trendWord = trend === 'up' ? '↑ improving' : trend === 'down' ? '↓ declining' : '→ stable';
+  document.getElementById('statusBar').innerHTML = `
+    <span class="status--active">Framework v1.0</span>
+    <span>${sessions.length} session${sessions.length !== 1 ? 's' : ''} logged</span>
+    <span>Avg composite: ${avg.toFixed(1)} / 100</span>
+    <span>${trendWord}</span>
+    <span>${disq > 0 ? disq + ' disqualified' : 'No disqualifications'}</span>
+  `;
+}
+
+function renderTrendChart(sessions) {
+  const wrap = document.getElementById('trendWrap');
+  wrap.innerHTML = sessions.length < 2
+    ? '<div class="no-data">Two or more sessions required for trend visualisation.</div>'
+    : '<canvas id="trendChart"></canvas>';
+
+  if (sessions.length < 2) return;
+
+  const labels = sessions.map(s => formatDate(s.declared_at));
+  const composite = sessions.map(s =>
+    (s.eu4_status === 'FAIL' || s.eu4a_status === 'DISQUALIFIED') ? 0 : s.composite_score
+  );
+
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Composite',
+        data: composite,
+        borderColor: '#c0392b',
+        backgroundColor: 'rgba(192,57,43,0.07)',
+        borderWidth: 2,
+        tension: 0.3,
+        pointBackgroundColor: '#c0392b',
+        pointRadius: 5,
+        fill: true,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            afterBody: (items) => {
+              const s = sessions[items[0].dataIndex];
+              return `Session: ${s.intent_summary || '—'}`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          min: 0, max: 100,
+          grid: { color: '#eee' },
+          ticks: { font: { family: 'EB Garamond', size: 13 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: 'EB Garamond', size: 12 }, maxRotation: 45 }
+        }
+      }
+    }
+  });
+}
+
+function renderLayerChart(sessions) {
+  const wrap = document.getElementById('layerWrap');
+  wrap.innerHTML = sessions.length < 1
+    ? '<div class="no-data">No sessions yet.</div>'
+    : '<canvas id="layerChart"></canvas>';
+
+  if (sessions.length < 1) return;
+
+  const labels = sessions.map(s => formatDate(s.declared_at));
+  const ha = sessions.map(s => s.layer_scores?.HA ?? null);
+  const eu = sessions.map(s => s.layer_scores?.EU ?? null);
+  const cc = sessions.map(s => s.layer_scores?.CC ?? null);
+
+  const ctx = document.getElementById('layerChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Human Agency (60%)', data: ha, backgroundColor: 'rgba(192,57,43,0.75)', borderWidth: 0 },
+        { label: 'Legislative (25%)', data: eu, backgroundColor: 'rgba(39,174,96,0.75)', borderWidth: 0 },
+        { label: 'Ethical Conduct (15%)', data: cc, backgroundColor: 'rgba(214,137,16,0.75)', borderWidth: 0 },
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'EB Garamond', size: 13 }, boxWidth: 14, padding: 18 }
+        }
+      },
+      scales: {
+        y: {
+          min: 0, max: 100,
+          grid: { color: '#eee' },
+          ticks: { font: { family: 'EB Garamond', size: 13 } }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: 'EB Garamond', size: 12 }, maxRotation: 45 }
+        }
+      }
+    }
+  });
+}
+
+function renderHeatmap(sessions) {
+  const avgs = computeAverages(sessions);
+  const el = document.getElementById('heatmap');
+
+  if (sessions.length === 0) {
+    el.innerHTML = '<div class="no-data">No sessions logged yet.</div>';
+    return;
+  }
+
+  el.innerHTML = Object.entries(CRITERIA_META).map(([id, meta]) => {
+    const avg = avgs[id];
+    const display = avg !== null ? avg.toFixed(1) : '—';
+    const bg = scoreColor(avg);
+    const pending = avg === null;
+    return `
+      <div class="heatmap-cell ${pending ? 'heatmap-cell--pending' : ''}"
+           style="${pending ? '' : 'background:' + bg}"
+           title="${id}: ${meta.name} · Avg ${display}">
+        <div class="heatmap-cell__id">${id}</div>
+        <div class="heatmap-cell__score">${display}</div>
+        <div class="heatmap-cell__name">${meta.name}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTable(sessions) {
+  const tbody = document.getElementById('sessionBody');
+  if (sessions.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10"><div class="no-data">No sessions logged yet. Use the prompt below to score your first session.</div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = [...sessions].reverse().map(s => {
+    const composite = (s.eu4_status === 'FAIL' || s.eu4a_status === 'DISQUALIFIED')
+      ? '<span class="flag-fail">DISQUALIFIED</span>'
+      : `<span class="score-pill" style="${pillColor(s.composite_score / 10)}">${s.composite_score.toFixed(1)}</span>`;
+
+    const ha = s.layer_scores?.HA !== undefined ? s.layer_scores.HA.toFixed(1) : '—';
+    const eu = s.layer_scores?.EU !== undefined ? s.layer_scores.EU.toFixed(1) : '—';
+    const cc = s.layer_scores?.CC !== undefined ? s.layer_scores.CC.toFixed(1) : '—';
+
+    return `
+      <tr>
+        <td>${formatDate(s.declared_at)}</td>
+        <td>${s.session_type || '—'}</td>
+        <td>${s.intent_summary || '—'}</td>
+        <td>${composite}</td>
+        <td>${ha}</td>
+        <td>${eu}</td>
+        <td>${cc}</td>
+        <td class="${flagClass(s.eu4_status)}">${s.eu4_status || 'PASS'}</td>
+        <td class="${flagClass(s.eu4a_status)}">${s.eu4a_status || 'PASS'}</td>
+        <td>${s.prompt_count ?? '—'}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function showError() {
+  ['statGrid', 'trendWrap', 'layerWrap', 'heatmap'].forEach(id => {
+    document.getElementById(id).innerHTML = `
+      <div class="error-box">
+        Could not fetch scores.json from GitHub. Check the repository is public and the file exists at
+        <code>daletimwood/Being-Human/main/scores.json</code>.
+      </div>`;
+  });
+  document.getElementById('sessionBody').innerHTML = '<tr><td colspan="10" class="error-box">Data unavailable.</td></tr>';
+  document.getElementById('statusBar').innerHTML = '<span class="status--active">⚠ Data unavailable — check scores.json</span>';
+}
+
+(async () => {
+  const data = await loadData();
+  if (!data || !data.sessions) { showError(); return; }
+
+  const sessions = data.sessions;
+  renderStats(sessions);
+  renderTrendChart(sessions);
+  renderLayerChart(sessions);
+  renderHeatmap(sessions);
+  renderTable(sessions);
+})();
+</script>
+
+</body>
+</html>
